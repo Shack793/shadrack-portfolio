@@ -1,0 +1,61 @@
+name: Deploy Portfolio
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy static site to cPanel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify required secrets
+        run: |
+          missing=0
+          for name in SSH_HOST SSH_USER SSH_PRIVATE_KEY DEPLOY_PATH; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing repository secret: $name"
+              missing=1
+            fi
+          done
+          if [ "$missing" -eq 1 ]; then exit 1; fi
+          echo "All required secrets are present."
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+
+      - name: Block webshell / malware signatures
+        run: |
+          set -e
+          matches=$(grep -rIlE 'eval[[:space:]]*\(|base64_decode|gzinflate|str_rot13|file_put_contents|shell_exec|passthru|popen|proc_open' --include='*.php' . || true)
+          if [ -n "$matches" ]; then
+            echo "::error::Potential webshell code found. Deployment blocked."
+            echo "$matches"
+            exit 1
+          fi
+          echo "No webshell signatures found."
+
+      - name: Deploy files over SSH (scp/tar)
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "index.html,css,img,js,lib,scss,LICENSE.txt,READ-ME.txt,bootstrap-cv-resume-template.jpg,.htaccess"
+          target: ${{ secrets.DEPLOY_PATH }}
+          overwrite: true
+          debug: true

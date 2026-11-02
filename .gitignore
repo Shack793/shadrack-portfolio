@@ -1,0 +1,18 @@
+# Server/credential notes - never publish
+server.md
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Logs and temp
+error_log
+*.log
+.DS_Store
+Thumbs.db
+
+# Editor / OS
+.vscode/
+.idea/
