@@ -66,6 +66,57 @@
   color: var(--light);
 }
 
+.profile-rotate {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  overflow: hidden;
+}
+
+.profile-rotate img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0;
+  -webkit-animation: profileFade 10s infinite;
+  animation: profileFade 10s infinite;
+}
+
+.profile-rotate img:nth-child(2) {
+  -webkit-animation-delay: 5s;
+  animation-delay: 5s;
+}
+
+@-webkit-keyframes profileFade {
+  0% { opacity: 0; }
+  4% { opacity: 1; }
+  50% { opacity: 1; }
+  54% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes profileFade {
+  0% { opacity: 0; }
+  4% { opacity: 1; }
+  50% { opacity: 1; }
+  54% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-rotate img {
+    -webkit-animation: none;
+    animation: none;
+  }
+
+  .profile-rotate img:first-child {
+    opacity: 1;
+  }
+}
+
 .back-to-top {
   position: fixed;
   display: none;
