@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy static site to cPanel
+    name: Deploy static site to VPS
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -55,7 +55,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "index.html,css,img,js,lib,scss,LICENSE.txt,READ-ME.txt,bootstrap-cv-resume-template.jpg,.htaccess"
+          source: "index.html,css,img,js,lib,scss,files,LICENSE.txt,READ-ME.txt,bootstrap-cv-resume-template.jpg,.htaccess"
           target: ${{ secrets.DEPLOY_PATH }}
           overwrite: true
           debug: true
